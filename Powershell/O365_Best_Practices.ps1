@@ -56,7 +56,7 @@ if($LitigationHoldRun -eq $true)
 
 if($AuditingRun -eq $true)
 {
-    $Auditing = $AllMailboxes | Where-Object {$_.AuditEnabled -eq $false -or ($_.AuditAdmin.count) -ne 11 -or ($_.AuditDelegate.count) -ne 9 -or ($_.AuditOwner.count) -ne 7 -or $_.AuditLogAgeLimit -lt "364"} 
+    $Auditing = $AllMailboxes | Where-Object {$_.AuditEnabled -eq $false -or ($_.AuditAdmin.count) -lt 1 -or ($_.AuditDelegate.count) -lt 1 -or ($_.AuditOwner.count) -lt 1 -or $_.AuditLogAgeLimit -lt "364"} 
 
     If(($Auditing.UserPrincipalName).count -eq 0)
     {
@@ -65,7 +65,7 @@ if($AuditingRun -eq $true)
     else
     {
         Write-Host "There are" ($Auditing.UserPrincipalName).count "mailboxes with Auditing not set correctly" -ForegroundColor Red
-        Foreach($Auditmailbox in $LitigationHold)
+        Foreach($Auditmailbox in $Auditing)
             {
             $Auditmailbox.UserPrincipalName | Set-Mailbox -AuditEnabled $true -AuditOwner Create,HardDelete,MailboxLogin,Move,MoveToDeletedItems,SoftDelete,Update -AuditDelegate Create,FolderBind,HardDelete,Move,MoveToDeletedItems,SendAs,SendOnBehalf,SoftDelete,Update –AuditAdmin Copy,Create,FolderBind,HardDelete,MessageBind,Move,MoveToDeletedItems,SendAs,SendOnBehalf,SoftDelete,Update -AuditLogAgeLimit 365
             }
